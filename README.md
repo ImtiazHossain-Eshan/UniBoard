@@ -21,3 +21,5 @@ UniBoard is a web-based platform that helps university clubs and organizations p
 - **Backend:** PHP  
 - **Database:** MySQL  
 - **Server:** Apache / XAMPP  
+## ER Diagram
+-   https://drive.google.com/file/d/1VNpdm7yzlRYlmIIH7v8jjDS6Hx9tfr-Q/view?usp=sharing
