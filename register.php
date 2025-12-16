@@ -22,7 +22,7 @@ if (is_logged_in()) {
             <h2>Create Account</h2>
             <p>Join UniBoard and connect with your community</p>
 
-            <form action="handlers/register_handler.php" method="POST">
+            <form action="handlers/register_handler.php" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="name">Full Name</label>
                     <input 
@@ -56,6 +56,74 @@ if (is_logged_in()) {
                         required
                         autocomplete="email"
                     >
+                </div>
+
+                <div class="form-group">
+                    <label for="department">Department</label>
+                    <select id="department" name="department" required>
+                        <option value="">Select Department</option>
+                        <option value="CSE">Computer Science & Engineering (CSE)</option>
+                        <option value="EEE">Electrical & Electronic Engineering (EEE)</option>
+                        <option value="BBA">Business Administration (BBA)</option>
+                        <option value="Economics">Economics</option>
+                        <option value="Law">Law</option>
+                        <option value="Pharmacy">Pharmacy</option>
+                        <option value="Architecture">Architecture</option>
+                        <option value="English">English</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input 
+                        type="tel" 
+                        id="phone" 
+                        name="phone" 
+                        placeholder="+880 1234-567890" 
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select id="gender" name="gender" required>
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <textarea 
+                        id="address" 
+                        name="address" 
+                        placeholder="Enter your full address" 
+                        rows="3"
+                        required
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="rfid">RFID Card Number (Optional)</label>
+                    <input 
+                        type="text" 
+                        id="rfid" 
+                        name="rfid" 
+                        placeholder="Scan or enter RFID number"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="profile_pic">Profile Picture (Optional)</label>
+                    <input 
+                        type="file" 
+                        id="profile_pic" 
+                        name="profile_pic" 
+                        accept="image/jpeg,image/jpg,image/png,image/gif"
+                    >
+                    <small style="color: #888; font-size: 0.85rem;">Max size: 2MB. Formats: JPG, PNG, GIF</small>
                 </div>
 
                 <div class="form-group">

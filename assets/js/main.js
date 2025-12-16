@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (input.id === 'password') {
             input.addEventListener('input', function () {
                 const strength = getPasswordStrength(this.value);
-                // You can add visual indicator here
+                // Will do it later
             });
         }
     });

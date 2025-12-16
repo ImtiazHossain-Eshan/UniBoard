@@ -65,4 +65,45 @@ function validate_email($email) {
 function validate_password($password) {
     return strlen($password) >= 6;
 }
+
+// Check if user is a club admin in a verified club
+function is_club_admin($pdo, $user_id) {
+    try {
+        $stmt = $pdo->prepare("
+            SELECT c.Club_ID, c.Name, c.Short_name, r.Role_name
+            FROM Role r
+            JOIN Club c ON r.Club_ID = c.Club_ID
+            WHERE r.St_ID = ? AND c.Verified = 1
+            AND (r.Role_name = 'Club_President' OR r.Role_name = 'Club_Admin')
+            LIMIT 1
+        ");
+        $stmt->execute([$user_id]);
+        return $stmt->fetch();
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+// Check if user is project admin
+function is_project_admin($pdo, $user_id) {
+    try {
+        $stmt = $pdo->prepare("SELECT Role_name FROM Role WHERE St_ID = ? AND Role_name = 'Project_Admin' AND Club_ID IS NULL");
+        $stmt->execute([$user_id]);
+        return $stmt->fetch() !== false;
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+// Get user role
+function get_user_role($pdo, $user_id) {
+    try {
+        $stmt = $pdo->prepare("SELECT Role_name FROM Role WHERE St_ID = ?");
+        $stmt->execute([$user_id]);
+        $result = $stmt->fetch();
+        return $result ? $result['Role_name'] : null;
+    } catch (PDOException $e) {
+        return null;
+    }
+}
 ?>

@@ -30,8 +30,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 setcookie('remember_token', bin2hex(random_bytes(32)), time() + (86400 * 30), "/");
             }
 
-            set_flash('home', 'Login successful! Welcome back, ' . $user['Name'], 'success');
-            redirect('../index.php');
+            // Check user role and redirect accordingly
+            $role = get_user_role($pdo, $user['Student_ID']);
+            
+            if ($role === 'Project_Admin') {
+                set_flash('admin', 'Welcome back, Project Admin!', 'success');
+                redirect('../admin_dashboard.php');
+            } elseif ($role && (stripos($role, 'President') !== false || stripos($role, 'Admin') !== false || stripos($role, 'Executive') !== false)) {
+                // Club admin - check if club is verified
+                $club_info = is_club_admin($pdo, $user['Student_ID']);
+                if ($club_info) {
+                    set_flash('dashboard', 'Welcome to your club dashboard!', 'success');
+                    redirect('../dashboard.php');
+                } else {
+                    set_flash('home', 'Login successful! Welcome back, ' . $user['Name'], 'success');
+                    redirect('../index.php');
+                }
+            } else {
+                set_flash('home', 'Login successful! Welcome back, ' . $user['Name'], 'success');
+                redirect('../index.php');
+            }
         } else {
             set_flash('login', 'Invalid email or password', 'error');
             redirect('../login.php');
