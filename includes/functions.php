@@ -1,10 +1,10 @@
 <?php
-// Start session if not already started
+// Starting session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Sanitize input
+// Sanitizing input
 function sanitize_input($data) {
     $data = trim($data);
     $data = stripslashes($data);
@@ -12,18 +12,18 @@ function sanitize_input($data) {
     return $data;
 }
 
-// Check if user is logged in
+// Checking if user is logged in
 function is_logged_in() {
     return isset($_SESSION['user_id']);
 }
 
-// Redirect function
+// Redirecting function
 function redirect($url) {
     header("Location: $url");
     exit();
 }
 
-// Set flash message
+// Setting flash message
 function set_flash($key, $message, $type = 'info') {
     $_SESSION['flash'][$key] = [
         'message' => $message,
@@ -41,7 +41,7 @@ function get_flash($key) {
     return null;
 }
 
-// Display flash message
+// Displaying flash message
 function display_flash($key) {
     $flash = get_flash($key);
     if ($flash) {
@@ -56,17 +56,17 @@ function display_flash($key) {
     }
 }
 
-// Validate email
+// Validating email
 function validate_email($email) {
     return filter_var($email, FILTER_VALIDATE_EMAIL);
 }
 
-// Validate password strength
+// Validating password strength
 function validate_password($password) {
     return strlen($password) >= 6;
 }
 
-// Check if user is a club admin in a verified club
+// Checking if user is a club admin in a verified club
 function is_club_admin($pdo, $user_id) {
     try {
         $stmt = $pdo->prepare("
@@ -84,7 +84,7 @@ function is_club_admin($pdo, $user_id) {
     }
 }
 
-// Check if user is project admin
+// Checking if user is project admin
 function is_project_admin($pdo, $user_id) {
     try {
         $stmt = $pdo->prepare("SELECT Role_name FROM Role WHERE St_ID = ? AND Role_name = 'Project_Admin' AND Club_ID IS NULL");
@@ -95,7 +95,7 @@ function is_project_admin($pdo, $user_id) {
     }
 }
 
-// Get user role
+// Getting user role
 function get_user_role($pdo, $user_id) {
     try {
         $stmt = $pdo->prepare("SELECT Role_name FROM Role WHERE St_ID = ?");

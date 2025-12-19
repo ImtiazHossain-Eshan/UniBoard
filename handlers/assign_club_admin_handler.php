@@ -15,7 +15,7 @@ $user_id = (int)($_POST['user_id'] ?? 0);
 $club_id = (int)($_POST['club_id'] ?? 0);
 $role_name = sanitize_input($_POST['role_name'] ?? '');
 
-// Validation
+// Validating user ID and club ID
 if ($user_id <= 0 || $club_id <= 0 || empty($role_name)) {
     set_flash('clubs', 'All fields are required', 'error');
     redirect('../manage_clubs.php');

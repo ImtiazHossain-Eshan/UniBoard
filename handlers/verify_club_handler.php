@@ -2,7 +2,7 @@
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 
-// Check if user is project admin
+// Checking if user is project admin
 if (!is_logged_in() || !is_project_admin($pdo, $_SESSION['user_id'])) {
     set_flash('clubs', 'Access denied. Project Admin privileges required.', 'error');
     redirect('../manage_clubs.php');
@@ -15,14 +15,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $club_id = (int)($_POST['club_id'] ?? 0);
 $verified = (int)($_POST['verified'] ?? 0);
 
-// Validation
+// Validating club ID
 if ($club_id <= 0) {
     set_flash('clubs', 'Invalid club ID', 'error');
     redirect('../manage_clubs.php');
 }
 
 try {
-    // Get club name for message
+    // Getting club name for message
     $stmt = $pdo->prepare("SELECT Name FROM Club WHERE Club_ID = ?");
     $stmt->execute([$club_id]);
     $club = $stmt->fetch();
@@ -32,7 +32,7 @@ try {
         redirect('../manage_clubs.php');
     }
     
-    // Update verification status
+    // Updating verification status
     $stmt = $pdo->prepare("UPDATE Club SET Verified = ?, Verification_requested_at = NOW() WHERE Club_ID = ?");
     $stmt->execute([$verified, $club_id]);
     

@@ -66,24 +66,14 @@ if (!$club_info) {
                         <div class="form-group">
                             <label for="title">Notice Title *</label>
                             <input type="text" id="title" name="title" required 
-                                   placeholder="e.g., Upcoming Meeting Announcement">
+                                   placeholder="e.g., Important Announcement">
                         </div>
 
                         <div class="form-group">
-                            <label for="message">Message *</label>
-                            <textarea id="message" name="message" rows="6" required 
+                            <label for="content">Notice Content *</label>
+                            <textarea id="content" name="content" rows="6" required 
                                       style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--input-bg); color: var(--text-color); font-family: inherit;"
-                                      placeholder="Write your announcement message..."></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="priority">Priority</label>
-                            <select id="priority" name="priority"
-                                    style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--input-bg); color: var(--text-color);">
-                                <option value="normal">Normal</option>
-                                <option value="high">High Priority</option>
-                                <option value="urgent">Urgent</option>
-                            </select>
+                                      placeholder="Write your notice here..."></textarea>
                         </div>
 
                         <div style="display: flex; gap: 1rem; margin-top: 2rem;">

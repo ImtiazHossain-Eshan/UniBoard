@@ -49,6 +49,14 @@ try {
 } catch (PDOException $e) {
     $roles = [];
 }
+
+// Count pending role requests
+try {
+    $stmt = $pdo->query("SELECT COUNT(*) FROM Role_Request WHERE Status = 'Pending'");
+    $pending_requests = $stmt->fetchColumn();
+} catch (PDOException $e) {
+    $pending_requests = 0;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -72,6 +80,14 @@ try {
                 </a>
                 <a href="manage_clubs.php" class="sidebar-link">
                     <span class="sidebar-icon">🎭</span> Manage Clubs
+                </a>
+                <a href="review_applications.php" class="sidebar-link">
+                    <span class="sidebar-icon">📋</span> Review Applications
+                    <?php if ($pending_requests > 0): ?>
+                        <span style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; margin-left: 0.5rem;">
+                            <?php echo $pending_requests; ?>
+                        </span>
+                    <?php endif; ?>
                 </a>
                 <a href="settings.php" class="sidebar-link">
                     <span class="sidebar-icon">⚙️</span> Settings
@@ -133,6 +149,13 @@ try {
                     </div>
                 </div>
                 <div class="stat-card stat-card-warning">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-info">
+                        <div class="stat-value"><?php echo $pending_requests; ?></div>
+                        <div class="stat-label">Pending Applications</div>
+                    </div>
+                </div>
+                <div class="stat-card stat-card-info">
                     <div class="stat-icon">🔑</div>
                     <div class="stat-info">
                         <div class="stat-value"><?php echo count($roles); ?></div>

@@ -56,7 +56,8 @@ if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === UPLOAD_
 
         // Generate unique filename
         $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-        $filename = 'profile_' . $user_id . '_' . time() . '.' . $extension;
+        $student_id = $user_id;
+        $filename = 'profile_' . $student_id . '_' . time() . '.' . $extension;
         $upload_path = $upload_dir . $filename;
 
         // Move uploaded file

@@ -23,7 +23,15 @@ try {
 
     // Check if user is Project Admin
     $is_admin = is_project_admin($pdo, $user_id);
-    $dashboard_url = $is_admin ? 'admin_dashboard.php' : 'dashboard.php';
+    $club_admin = is_club_admin($pdo, $user_id);
+    
+    if ($is_admin) {
+        $dashboard_url = 'admin_dashboard.php';
+    } elseif ($club_admin) {
+        $dashboard_url = 'dashboard.php';
+    } else {
+        $dashboard_url = 'user_dashboard.php';
+    }
 } catch (PDOException $e) {
     set_flash('settings', 'Failed to load user data', 'error');
     redirect('index.php');

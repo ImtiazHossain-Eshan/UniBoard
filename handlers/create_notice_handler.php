@@ -22,13 +22,12 @@ $club_id = $club_info['Club_ID'];
 
 // Get form data
 $title = sanitize_input($_POST['title'] ?? '');
-$message = sanitize_input($_POST['message'] ?? '');
-$priority = sanitize_input($_POST['priority'] ?? 'normal');
+$content = sanitize_input($_POST['content'] ?? '');
 
 // Validation
 $errors = [];
 if (empty($title)) $errors[] = 'Title is required';
-if (empty($message)) $errors[] = 'Message is required';
+if (empty($content)) $errors[] = 'Content is required';
 
 if (!empty($errors)) {
     set_flash('notice', implode('<br>', $errors), 'error');
@@ -36,34 +35,17 @@ if (!empty($errors)) {
 }
 
 try {
-    // Insert notification
+    // Insert notice
     $stmt = $pdo->prepare("
-        INSERT INTO Notifications (Title, Message, Created_at, Is_read, Club_ID)
-        VALUES (?, ?, NOW(), 0, ?)
+        INSERT INTO Notice (Title, Content, Club_ID, Created_at)
+        VALUES (?, ?, ?, NOW())
     ");
-    $stmt->execute([$title, $message, $club_id]);
+    $stmt->execute([$title, $content, $club_id]);
 
-    $notification_id = $pdo->lastInsertId();
-
-    // Send notification to all club members
-    $stmt = $pdo->prepare("
-        SELECT Student_ID FROM Joins_club WHERE Club_ID = ?
-    ");
-    $stmt->execute([$club_id]);
-    $members = $stmt->fetchAll();
-
-    $insert_stmt = $pdo->prepare("
-        INSERT INTO Gets_notification (Student_ID, Notification_ID) VALUES (?, ?)
-    ");
-
-    foreach ($members as $member) {
-        $insert_stmt->execute([$member['Student_ID'], $notification_id]);
-    }
-
-    set_flash('dashboard', 'Notice published successfully to all members!', 'success');
+    set_flash('dashboard', 'Notice posted successfully!', 'success');
     redirect('../dashboard.php');
 } catch (PDOException $e) {
-    set_flash('notice', 'Failed to create notice. Please try again.', 'error');
+    set_flash('notice', 'Failed to create notice: ' . $e->getMessage(), 'error');
     redirect('../create_notice.php');
 }
 ?>

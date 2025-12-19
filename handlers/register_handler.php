@@ -3,7 +3,6 @@ require_once '../config/database.php';
 require_once '../includes/functions.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get basic fields
     $name = sanitize_input($_POST['name'] ?? '');
     $student_id = sanitize_input($_POST['student_id'] ?? '');
     $email = sanitize_input($_POST['email'] ?? '');

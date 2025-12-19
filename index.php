@@ -45,7 +45,7 @@ require_once 'includes/functions.php';
                     <a href="register.php" class="btn btn-primary">Get Started Free</a>
                     <a href="#features" class="btn btn-outline">Learn More</a>
                 <?php else: ?>
-                    <a href="dashboard.php" class="btn btn-primary">Go to Dashboard</a>
+                    <a href="user_dashboard.php" class="btn btn-primary">Go to Dashboard</a>
                     <a href="#features" class="btn btn-outline">Explore Features</a>
                 <?php endif; ?>
             </div>

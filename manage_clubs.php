@@ -49,6 +49,9 @@ try {
                 <a href="manage_clubs.php" class="sidebar-link active">
                     <span class="sidebar-icon">🎭</span> Manage Clubs
                 </a>
+                <a href="review_applications.php" class="sidebar-link">
+                    <span class="sidebar-icon">📋</span> Review Applications
+                </a>
                 <a href="settings.php" class="sidebar-link">
                     <span class="sidebar-icon">⚙️</span> Settings
                 </a>
@@ -163,11 +166,19 @@ try {
                                                 <?php endif; ?>
                                             </td>
                                             <td style="padding: 12px;">
-                                                <button onclick="assignToClub(<?php echo $club['Club_ID']; ?>, '<?php echo htmlspecialchars($club['Name'], ENT_QUOTES); ?>')" 
-                                                        class="btn btn-primary" 
-                                                        style="padding: 6px 12px; font-size: 0.85rem;">
-                                                    Assign Role
-                                                </button>
+                                                <div style="display: flex; gap: 0.5rem;">
+                                                    <button onclick="assignToClub(<?php echo $club['Club_ID']; ?>, '<?php echo htmlspecialchars($club['Name'], ENT_QUOTES); ?>')" 
+                                                            class="btn btn-primary" 
+                                                            style="padding: 6px 12px; font-size: 0.85rem;">
+                                                        Assign Role
+                                                    </button>
+                                                    <form action="handlers/delete_club_handler.php" method="POST" style="display: inline; margin: 0;" onsubmit="return confirm('⚠️ Are you sure you want to DELETE this club?\n\nThis will permanently remove:\n• All events and notices\n• All members and followers\n• All club data\n\nThis action CANNOT be undone!');">
+                                                        <input type="hidden" name="club_id" value="<?php echo $club['Club_ID']; ?>">
+                                                        <button type="submit" class="btn btn-outline" style="padding: 6px 12px; font-size: 0.85rem; color: #ef4444; border-color: #ef4444;">
+                                                            🗑️ Delete
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -200,15 +211,21 @@ try {
                         </div>
 
                         <div class="form-group">
-                            <label for="user_id">Select User *</label>
-                            <select id="user_id" name="user_id" required style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--input-bg); color: var(--text-color);">
-                                <option value="">Choose a user...</option>
-                                <?php foreach ($users as $user): ?>
-                                    <option value="<?php echo $user['Student_ID']; ?>">
-                                        <?php echo htmlspecialchars($user['Name']) . ' (' . htmlspecialchars($user['GSuite_Email']) . ')'; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                            <label for="student_id_search">Student ID *</label>
+                            <input 
+                                type="text" 
+                                id="student_id_search" 
+                                name="user_id"
+                                placeholder="Enter Student ID (e.g., 23101137)" 
+                                required
+                                style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--input-bg); color: var(--text-color);"
+                            >
+                            <div id="user_name_display" style="margin-top: 0.5rem; padding: 8px; background: rgba(99, 102, 241, 0.1); border-radius: 8px; display: none;">
+                                <strong style="color: var(--primary-color);">User:</strong> <span id="found_user_name"></span>
+                            </div>
+                            <div id="user_not_found" style="margin-top: 0.5rem; padding: 8px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; display: none; color: #ef4444;">
+                                User not found with this Student ID
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -288,8 +305,37 @@ try {
         function closeModal() {
             document.getElementById('assignModal').style.display = 'none';
             document.getElementById('hidden_club_id').value = '';
-            document.getElementById('user_id').value = '';
+            document.getElementById('student_id_search').value = '';
+            document.getElementById('user_name_display').style.display = 'none';
+            document.getElementById('user_not_found').style.display = 'none';
         }
+
+        // Student ID Search
+        const userDatabase = <?php echo json_encode($users); ?>;
+        
+        document.getElementById('student_id_search').addEventListener('input', function() {
+            const studentId = this.value.trim();
+            const userNameDisplay = document.getElementById('user_name_display');
+            const userNotFound = document.getElementById('user_not_found');
+            const foundUserName = document.getElementById('found_user_name');
+            
+            if (studentId === '') {
+                userNameDisplay.style.display = 'none';
+                userNotFound.style.display = 'none';
+                return;
+            }
+            
+            const user = userDatabase.find(u => u.Student_ID == studentId);
+            
+            if (user) {
+                foundUserName.textContent = user.Name + ' (' + user.GSuite_Email + ')';
+                userNameDisplay.style.display = 'block';
+                userNotFound.style.display = 'none';
+            } else {
+                userNameDisplay.style.display = 'none';
+                userNotFound.style.display = 'block';
+            }
+        });
 
         // Close on outside click
         document.getElementById('assignModal').addEventListener('click', function(e) {
