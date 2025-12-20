@@ -595,7 +595,7 @@ body {
 }
 
 .sidebar-close {
-    display: none;
+    display: block;
     background: none;
     border: none;
     color: var(--text-color);
@@ -678,7 +678,7 @@ body {
 }
 
 .sidebar-toggle {
-    display: none;
+    display: block;
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     color: var(--text-color);

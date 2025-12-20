@@ -32,7 +32,7 @@ if (!$club_info) {
             </div>
             <nav class="sidebar-nav">
                 <a href="dashboard.php" class="sidebar-link">
-                    <span class="sidebar-icon">📊</span> Dashboard
+                    <span class="sidebar-icon"></span> Dashboard
                 </a>
                 <a href="create_event.php" class="sidebar-link">
                     <span class="sidebar-icon">➕</span> Create Event

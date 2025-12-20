@@ -218,9 +218,9 @@ try {
                                                 <?php if ($app['Status'] == 'Pending'): ?>
                                                     <span style="color: #f59e0b;">🟡 Pending</span>
                                                 <?php elseif ($app['Status'] == 'Approved'): ?>
-                                                    <span style="color: #10b981;">✅ Approved</span>
+                                                    <span style="color: #10b981;"> Approved</span>
                                                 <?php else: ?>
-                                                    <span style="color: #ef4444;">❌ Rejected</span>
+                                                    <span style="color: #ef4444;"> Rejected</span>
                                                 <?php endif; ?>
                                             </td>
                                             <td style="padding: 12px; color: var(--text-muted); font-size: 0.875rem;">
