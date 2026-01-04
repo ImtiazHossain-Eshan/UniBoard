@@ -106,4 +106,89 @@ function get_user_role($pdo, $user_id) {
         return null;
     }
 }
+
+// Send Notification to Club Followers
+function send_notification($pdo, $club_id, $title, $message, $link = '') {
+    try {
+        // 1. Get Club Details
+        $stmt = $pdo->prepare("SELECT Name FROM Club WHERE Club_ID = ?");
+        $stmt->execute([$club_id]);
+        $club = $stmt->fetch();
+        if (!$club) return false;
+        
+        $club_name = $club['Name'];
+
+        // 2. Get Followers
+        $stmt = $pdo->prepare("
+            SELECT u.Student_ID, u.GSuite_Email, u.Name
+            FROM Follows_club f
+            JOIN User u ON f.Student_ID = u.Student_ID
+            WHERE f.Club_ID = ?
+        ");
+        $stmt->execute([$club_id]);
+        $followers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (empty($followers)) return true;
+
+        // 3. Create Notification in DB
+        $notification_content = "[$club_name] $title";
+        $stmt = $pdo->prepare("INSERT INTO Notifications (Content, Link, Type) VALUES (?, ?, 'event')");
+        $stmt->execute([$notification_content, $link]);
+        $notification_id = $pdo->lastInsertId();
+
+        // 4. Link to Followers and Send Email
+        $insert_stmt = $pdo->prepare("INSERT INTO Gets_notification (Student_ID, Notification_ID) VALUES (?, ?)");
+        
+        foreach ($followers as $follower) {
+            // Add to Dashboard Notifications
+            $insert_stmt->execute([$follower['Student_ID'], $notification_id]);
+            
+            // Send Email
+            $to = $follower['GSuite_Email'];
+            $subject = "Update from $club_name: $title";
+            $email_body = "Hi " . htmlspecialchars($follower['Name']) . ",\n\n" .
+                         "$club_name has posted an update:\n\n" .
+                         "$title\n$message\n\n" .
+                         "View details on UniBoard.\n\n" .
+                         "Regards,\nUniBoard Team";
+            $headers = "From: notifications@uniboard.local";
+            
+            // Using @ to suppress local mail setup warnings
+            @mail($to, $subject, $email_body, $headers);
+        }
+        
+        return true;
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+// Update Event Analytics
+function update_analytics($pdo, $event_id, $type, $operation = 'add') {
+    try {
+        // Ensure analytics row exists
+        $stmt = $pdo->prepare("INSERT IGNORE INTO EventAnalytics (Event_ID) VALUES (?)");
+        $stmt->execute([$event_id]);
+        
+        $op_sign = ($operation === 'remove') ? '-' : '+';
+        
+        // Update specific metric
+        switch ($type) {
+            case 'interested':
+                // Prevent negative counts
+                $sql = "UPDATE EventAnalytics SET Interested_count = GREATEST(0, Interested_count $op_sign 1), Last_updated = NOW() WHERE Event_ID = ?";
+                $stmt = $pdo->prepare($sql);
+                return $stmt->execute([$event_id]);
+                break;
+            case 'going':
+                $sql = "UPDATE EventAnalytics SET Going_count = GREATEST(0, Going_count $op_sign 1), Last_updated = NOW() WHERE Event_ID = ?";
+                $stmt = $pdo->prepare($sql);
+                return $stmt->execute([$event_id]);
+                break;
+            default:
+                return false;
+        }
+    } catch (PDOException $e) {
+        return false;
+    }
+}
 ?>

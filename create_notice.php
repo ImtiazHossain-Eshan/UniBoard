@@ -66,6 +66,7 @@ if (!$club_info) {
                         <div class="form-group">
                             <label for="title">Notice Title *</label>
                             <input type="text" id="title" name="title" required 
+                                   style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--input-bg); color: var(--text-color); font-family: inherit;"
                                    placeholder="e.g., Important Announcement">
                         </div>
 

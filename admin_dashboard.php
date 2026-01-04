@@ -57,6 +57,16 @@ try {
 } catch (PDOException $e) {
     $pending_requests = 0;
 }
+
+// Fetch notification count
+$unread_count = 0;
+try {
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM Gets_notification WHERE Student_ID = ? AND Is_read = 0");
+    $stmt->execute([$admin_id]);
+    $unread_count = $stmt->fetchColumn();
+} catch (PDOException $e) {
+    $unread_count = 0;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -77,6 +87,17 @@ try {
             <nav class="sidebar-nav">
                 <a href="admin_dashboard.php" class="sidebar-link active">
                     <span class="sidebar-icon"></span> Dashboard
+                </a>
+                <a href="notifications.php" class="sidebar-link">
+                    <span class="sidebar-icon">🔔</span> Notifications
+                    <?php if ($unread_count > 0): ?>
+                        <span style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; margin-left: 0.5rem;">
+                            <?= $unread_count ?>
+                        </span>
+                    <?php endif; ?>
+                </a>
+                <a href="browse_event.php" class="sidebar-link">
+                    <span class="sidebar-icon">📅</span> Browse Events
                 </a>
                 <a href="manage_clubs.php" class="sidebar-link">
                     <span class="sidebar-icon">🎭</span> Manage Clubs

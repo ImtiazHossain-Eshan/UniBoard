@@ -45,26 +45,6 @@ try {
     $applications = [];
 }
 
-// Fetch upcoming events from all clubs
-$events = [];
-try {
-    $stmt = $pdo->query("SHOW TABLES LIKE 'Event'");
-    if ($stmt->rowCount() > 0) {
-        $stmt = $pdo->query("
-            SELECT e.*, c.Name as Club_Name, c.Short_name, em.Media_url as Poster_url
-            FROM Event e
-            JOIN Club c ON e.Club_ID = c.Club_ID
-            LEFT JOIN EventMedia em ON e.Event_ID = em.Event_ID
-            WHERE e.Start_time >= NOW()
-            ORDER BY e.Start_time ASC
-            LIMIT 5
-        ");
-        $events = $stmt->fetchAll();
-    }
-} catch (PDOException $e) {
-    $events = [];
-}
-
 // Fetch recent notices from all clubs
 $all_notices = [];
 try {
@@ -81,6 +61,43 @@ try {
     }
 } catch (PDOException $e) {
     $all_notices = [];
+}
+
+// Fetch personalized upcoming events (Limit 3)
+$feed_events = [];
+try {
+    $stmt = $pdo->prepare("
+        SELECT 
+            e.Event_ID, e.Title, e.Start_time, e.Description,
+            c.Name AS club_name,
+            em.Media_url as Poster_url
+        FROM Event e
+        JOIN Club c ON e.Club_ID = c.Club_ID
+        LEFT JOIN EventMedia em ON e.Event_ID = em.Event_ID
+        WHERE (
+            e.Club_ID IN (SELECT Club_ID FROM Follows_club WHERE Student_ID = ?) 
+            OR 
+            e.Event_Type_ID IN (SELECT Event_Type_ID FROM UserInterests WHERE Student_ID = ?)
+        )
+        AND e.Start_time >= NOW()
+        GROUP BY e.Event_ID
+        ORDER BY e.Start_time ASC
+        LIMIT 3
+    ");
+    $stmt->execute([$user_id, $user_id]);
+    $feed_events = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $feed_events = [];
+}
+
+// Fetch notification count
+$unread_count = 0;
+try {
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM Gets_notification WHERE Student_ID = ? AND Is_read = 0");
+    $stmt->execute([$user_id]);
+    $unread_count = $stmt->fetchColumn();
+} catch (PDOException $e) {
+    $unread_count = 0;
 }
 ?>
 <!DOCTYPE html>
@@ -113,9 +130,22 @@ try {
                         My Club Dashboard
                     </a>
                 <?php endif; ?>
+                <a href="browse_event.php" class="sidebar-link">
+                    <span class="sidebar-icon">📅</span>
+                    Browse Events
+                </a>
                 <a href="explore_clubs.php" class="sidebar-link">
                     <span class="sidebar-icon">🔍</span>
                     Explore Clubs
+                </a>
+                <a href="notifications.php" class="sidebar-link">
+                    <span class="sidebar-icon">🔔</span>
+                    Notifications
+                    <?php if ($unread_count > 0): ?>
+                        <span style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; margin-left: 0.5rem;">
+                            <?= $unread_count ?>
+                        </span>
+                    <?php endif; ?>
                 </a>
                 <a href="apply_for_club.php" class="sidebar-link">
                     <span class="sidebar-icon">📝</span>
@@ -182,6 +212,14 @@ try {
                         </div>
                     </a>
                 <?php endif; ?>
+                <a href="browse_event.php" style="text-decoration: none;">
+                    <div class="stat-card stat-card-info" style="cursor: pointer;">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Browse Events</div>
+                        </div>
+                    </div>
+                </a>
                 <a href="explore_clubs.php" style="text-decoration: none;">
                     <div class="stat-card stat-card-secondary" style="cursor: pointer;">
                         <div class="stat-icon">🔍</div>
@@ -191,6 +229,41 @@ try {
                     </div>
                 </a>
             </div>
+
+            <!-- Personalized Feed Preview -->
+            <section class="dashboard-card" style="margin-bottom: 2rem;">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3>Upcoming For You</h3>
+                    <a href="browse_event.php?view=my_feed" style="font-size: 0.9rem; color: var(--primary-color); text-decoration: none;">View All &rarr;</a>
+                </div>
+                <div class="card-body">
+                    <?php if (!empty($feed_events)): ?>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+                            <?php foreach ($feed_events as $e): ?>
+                                <a href="browse_event.php#event-<?= $e['Event_ID'] ?>" style="text-decoration: none; color: inherit;">
+                                    <div style="background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; overflow: hidden; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                                        <?php if (!empty($e['Poster_url']) && file_exists($e['Poster_url'])): ?>
+                                            <img src="<?= htmlspecialchars($e['Poster_url']) ?>" style="width: 100%; height: 150px; object-fit: cover;">
+                                        <?php else: ?>
+                                            <div style="width: 100%; height: 150px; background: var(--glass-border); display: flex; align-items: center; justify-content: center; font-size: 2.5rem;">📅</div>
+                                        <?php endif; ?>
+                                        <div style="padding: 1rem;">
+                                            <h4 style="margin: 0 0 0.5rem 0; font-size: 1.1rem;"><?= htmlspecialchars($e['Title']) ?></h4>
+                                            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">
+                                                <?= date('M d, g:i A', strtotime($e['Start_time'])) ?> • <?= htmlspecialchars($e['club_name']) ?>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php else: ?>
+                        <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                            <p>No personalized events found. <a href="settings.php" style="color: var(--primary-color);">Update your interests</a> or follow clubs to see them here!</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </section>
 
             <!-- My Applications -->
             <?php if (!empty($applications)): ?>
@@ -235,30 +308,7 @@ try {
                 </section>
             <?php endif; ?>
 
-            <!-- Upcoming Events -->
-            <?php if (!empty($events)): ?>
-                <section class="dashboard-card" style="margin-top: 2.5rem;">
-                    <div class="card-header">
-                        <h3>Upcoming Events</h3>
-                    </div>
-                    <div class="card-body">
-                        <?php foreach ($events as $event): ?>
-                            <div style="padding: 1rem; border-bottom: 1px solid var(--glass-border);">
-                                <?php if (!empty($event['Poster_url']) && file_exists($event['Poster_url'])): ?>
-                                    <img src="<?php echo htmlspecialchars($event['Poster_url']); ?>" 
-                                         alt="Event Poster" 
-                                         style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 0.75rem;">
-                                <?php endif; ?>
-                                <h4 style="margin: 0 0 0.5rem 0;"><?php echo htmlspecialchars($event['Title']); ?></h4>
-                                <p style="color: var(--text-muted); font-size: 0.875rem; margin: 0;">
-                                    <strong><?php echo htmlspecialchars($event['Club_Name']); ?></strong> • 
-                                    <?php echo date('M d, Y g:i A', strtotime($event['Start_time'])); ?>
-                                </p>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                </section>
-            <?php endif; ?>
+            
 
             <!-- Recent Notices -->
             <?php if (!empty($all_notices)): ?>

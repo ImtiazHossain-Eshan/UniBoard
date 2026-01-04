@@ -48,20 +48,7 @@ try {
     $club_events = [];
 }
 
-// Fetch club's events
-try {
-    $stmt = $pdo->prepare("
-        SELECT Event_ID, Name, Description, Start_time, Location_ID, Event_type_ID
-        FROM Event
-        WHERE Club_ID = ?
-        ORDER BY Start_time DESC
-        LIMIT 10
-    ");
-    $stmt->execute([$club_id]);
-    $events = $stmt->fetchAll();
-} catch (PDOException $e) {
-    $events = [];
-}
+
 
 // Fetch club's notices from Notice table
 try {
@@ -76,6 +63,16 @@ try {
     $notices = $stmt->fetchAll();
 } catch (PDOException $e) {
     $notices = [];
+}
+
+// Fetch notification count
+$unread_count = 0;
+try {
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM Gets_notification WHERE Student_ID = ? AND Is_read = 0");
+    $stmt->execute([$user_id]);
+    $unread_count = $stmt->fetchColumn();
+} catch (PDOException $e) {
+    $unread_count = 0;
 }
 ?>
 <!DOCTYPE html>
@@ -101,6 +98,23 @@ try {
                 <a href="dashboard.php" class="sidebar-link active">
                     <span class="sidebar-icon"></span>
                     Dashboard
+                </a>
+                <a href="analytics_dashboard.php" class="sidebar-link">
+                    <span class="sidebar-icon">📊</span>
+                    Analytics
+                </a>
+                <a href="notifications.php" class="sidebar-link">
+                    <span class="sidebar-icon">🔔</span>
+                    Notifications
+                    <?php if ($unread_count > 0): ?>
+                        <span style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; margin-left: 0.5rem;">
+                            <?= $unread_count ?>
+                        </span>
+                    <?php endif; ?>
+                </a>
+                <a href="browse_event.php" class="sidebar-link">
+                    <span class="sidebar-icon">📅</span>
+                    Browse Events
                 </a>
                 <a href="create_event.php" class="sidebar-link">
                     <span class="sidebar-icon">➕</span>
@@ -161,7 +175,7 @@ try {
                         <span class="action-icon">📅</span>
                         Create Event
                     </a>
-                    <a href="create_notice.php" class="action-btn action-btn-secondary">
+                    <a href="create_notice.php" class="action-btn action-btn-primary">
                         <span class="action-icon">📢</span>
                         Create Notice
                     </a>
@@ -170,39 +184,12 @@ try {
 
             <!-- Content Grid -->
             <div class="content-grid">
-                <!-- Events List -->
-                <section class="dashboard-card">
-                    <div class="card-header">
-                        <h3>Your Events</h3>
-                        <a href="create_event.php" class="card-link">Create New →</a>
-                    </div>
-                    <div class="card-body">
-                        <?php if (empty($events)): ?>
-                            <p class="empty-state">No events yet. Create your first event!</p>
-                        <?php else: ?>
-                            <div class="event-list">
-                                <?php foreach ($events as $event): ?>
-                                    <div class="event-item">
-                                        <div class="event-date">
-                                            <div class="event-day"><?php echo date('d', strtotime($event['Start_time'])); ?></div>
-                                            <div class="event-month"><?php echo strtoupper(date('M', strtotime($event['Start_time']))); ?></div>
-                                        </div>
-                                        <div class="event-details">
-                                            <h4><?php echo htmlspecialchars($event['Name']); ?></h4>
-                                            <p><?php echo htmlspecialchars(substr($event['Description'], 0, 60)) . '...'; ?></p>
-                                        </div>
-                                        <a href="edit_event.php?id=<?php echo $event['Event_ID']; ?>" class="event-action">Edit</a>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </section>
+
 
                 <!-- My Events Section -->
                 <section class="dashboard-card">
                     <div class="card-header">
-                        <h3>My Events</h3>
+                        <h3>My Created Events</h3>
                         <a href="create_event.php" class="card-link">Create New →</a>
                     </div>
                     <div class="card-body">

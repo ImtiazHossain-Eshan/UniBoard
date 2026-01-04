@@ -36,6 +36,18 @@ try {
     set_flash('settings', 'Failed to load user data', 'error');
     redirect('index.php');
 }
+
+// Fetch available Event Types & User Interests
+try {
+    $all_types = $pdo->query("SELECT * FROM EventType WHERE Status = 'Active'")->fetchAll();
+    
+    $stmt = $pdo->prepare("SELECT Event_Type_ID FROM UserInterests WHERE Student_ID = ?");
+    $stmt->execute([$user_id]);
+    $user_interests = $stmt->fetchAll(PDO::FETCH_COLUMN); // Array of IDs
+} catch (PDOException $e) {
+    $all_types = [];
+    $user_interests = [];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -178,6 +190,44 @@ try {
 
                         <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">
                             Update Profile
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Interests Settings -->
+            <section class="dashboard-card" style="margin-top: 2.5rem;">
+                <div class="card-header">
+                    <h3>My Interests</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Select the types of events you want to see in your personalized feed.</p>
+                </div>
+                <div class="card-body">
+                    <form action="handlers/update_interests_handler.php" method="POST">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">
+                            <?php foreach ($all_types as $type): ?>
+                                <label style="
+                                    display: flex; 
+                                    align-items: center; 
+                                    gap: 0.5rem; 
+                                    padding: 1rem; 
+                                    border: 1px solid var(--glass-border); 
+                                    border-radius: 8px; 
+                                    cursor: pointer;
+                                    transition: background 0.2s;
+                                    background: <?php echo in_array($type['Event_Type_ID'], $user_interests) ? 'rgba(59, 130, 246, 0.1)' : 'transparent'; ?>;
+                                ">
+                                    <input 
+                                        type="checkbox" 
+                                        name="interests[]" 
+                                        value="<?php echo $type['Event_Type_ID']; ?>"
+                                        <?php echo in_array($type['Event_Type_ID'], $user_interests) ? 'checked' : ''; ?>
+                                    >
+                                    <span style="font-weight: 500;"><?php echo htmlspecialchars($type['Name']); ?></span>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">
+                            Save Interests
                         </button>
                     </form>
                 </div>

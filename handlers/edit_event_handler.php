@@ -98,6 +98,9 @@ try {
         }
     }
     
+    // Send Notification
+    send_notification($pdo, $club_info['Club_ID'], 'Event Updated', "$event_name has been updated.", "browse_event.php");
+
     set_flash('dashboard', 'Event updated successfully!', 'success');
     redirect('../dashboard.php');
 } catch (PDOException $e) {

@@ -80,6 +80,9 @@ try {
         }
     }
 
+    // Send Notification
+    send_notification($pdo, $club_id, 'New Event Created', "$event_name at " . date('M d, g:i A', strtotime($start_time)), "browse_event.php");
+
     set_flash('dashboard', 'Event created successfully!', 'success');
     redirect('../dashboard.php');
 } catch (PDOException $e) {

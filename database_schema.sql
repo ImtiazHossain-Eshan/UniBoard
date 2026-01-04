@@ -61,8 +61,8 @@ CREATE TABLE Follows_club (
     Student_ID INT,
     Club_ID INT,
     PRIMARY KEY (Student_ID, Club_ID),
-    FOREIGN KEY (Student_ID) REFERENCES User(Student_ID),
-    FOREIGN KEY (Club_ID) REFERENCES Club(Club_ID)
+    FOREIGN KEY (Student_ID) REFERENCES User(Student_ID) ON DELETE CASCADE,
+    FOREIGN KEY (Club_ID) REFERENCES Club(Club_ID) ON DELETE CASCADE
 );
 
 CREATE TABLE ClubMembership (
@@ -77,8 +77,8 @@ CREATE TABLE Joins_club (
     Student_ID INT,
     Membership_ID INT,
     PRIMARY KEY (Student_ID, Membership_ID),
-    FOREIGN KEY (Student_ID) REFERENCES User(Student_ID),
-    FOREIGN KEY (Membership_ID) REFERENCES ClubMembership(Membership_ID)
+    FOREIGN KEY (Student_ID) REFERENCES User(Student_ID) ON DELETE CASCADE,
+    FOREIGN KEY (Membership_ID) REFERENCES ClubMembership(Membership_ID) ON DELETE CASCADE
 );
 
 CREATE TABLE Notifications (
@@ -94,8 +94,8 @@ CREATE TABLE Gets_notification (
     Student_ID INT,
     Notification_ID INT,
     PRIMARY KEY (Student_ID, Notification_ID),
-    FOREIGN KEY (Student_ID) REFERENCES User(Student_ID),
-    FOREIGN KEY (Notification_ID) REFERENCES Notifications(Notification_ID)
+    FOREIGN KEY (Student_ID) REFERENCES User(Student_ID) ON DELETE CASCADE,
+    FOREIGN KEY (Notification_ID) REFERENCES Notifications(Notification_ID) ON DELETE CASCADE
 );
 
 CREATE TABLE Location (
@@ -150,9 +150,9 @@ CREATE TABLE Participate_in_events (
     Rsvp_ID INT,
     Event_ID INT,
     PRIMARY KEY (Student_ID, Event_ID),
-    FOREIGN KEY (Student_ID) REFERENCES User(Student_ID),
+    FOREIGN KEY (Student_ID) REFERENCES User(Student_ID) ON DELETE CASCADE,
     FOREIGN KEY (Rsvp_ID) REFERENCES RSVP(Rsvp_ID),
-    FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID)
+    FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID) ON DELETE CASCADE
 );
 
 CREATE TABLE EventMedia (
@@ -172,7 +172,15 @@ CREATE TABLE EventAnalytics (
     Going_count INT DEFAULT 0,
     Last_updated TIMESTAMP,
     Event_ID INT,
-    FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID)
+    FOREIGN KEY (Event_ID) REFERENCES Event(Event_ID) ON DELETE CASCADE
+);
+
+CREATE TABLE UserInterests (
+    Student_ID INT,
+    Event_Type_ID INT,
+    PRIMARY KEY (Student_ID, Event_Type_ID),
+    FOREIGN KEY (Student_ID) REFERENCES User(Student_ID) ON DELETE CASCADE,
+    FOREIGN KEY (Event_Type_ID) REFERENCES EventType(Event_Type_ID) ON DELETE CASCADE
 );
 
 
