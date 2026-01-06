@@ -100,7 +100,7 @@ try {
                     Dashboard
                 </a>
                 <a href="analytics_dashboard.php" class="sidebar-link">
-                    <span class="sidebar-icon">📊</span>
+                    <span class="sidebar-icon"></span>
                     Analytics
                 </a>
                 <a href="notifications.php" class="sidebar-link">
@@ -113,15 +113,15 @@ try {
                     <?php endif; ?>
                 </a>
                 <a href="browse_event.php" class="sidebar-link">
-                    <span class="sidebar-icon">📅</span>
+                    <span class="sidebar-icon"></span>
                     Browse Events
                 </a>
                 <a href="create_event.php" class="sidebar-link">
-                    <span class="sidebar-icon">➕</span>
+                    <span class="sidebar-icon"></span>
                     Create Event
                 </a>
                 <a href="create_notice.php" class="sidebar-link">
-                    <span class="sidebar-icon">📢</span>
+                    <span class="sidebar-icon"></span>
                     Create Notice
                 </a>
                 <a href="settings.php" class="sidebar-link">

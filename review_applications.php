@@ -196,13 +196,13 @@ try {
                                         <form action="handlers/approve_application_handler.php" method="POST" style="display: inline;">
                                             <input type="hidden" name="request_id" value="<?php echo $request['Request_ID']; ?>">
                                             <button type="submit" class="btn btn-primary" style="background: #10b981; border-color: #10b981;">
-                                                ✅ Approve
+                                                Approve
                                             </button>
                                         </form>
                                         <form action="handlers/reject_application_handler.php" method="POST" style="display: inline;">
                                             <input type="hidden" name="request_id" value="<?php echo $request['Request_ID']; ?>">
                                             <button type="submit" class="btn" style="background: #ef4444; border-color: #ef4444; color: white;">
-                                                ❌ Reject
+                                                Reject
                                             </button>
                                         </form>
                                     </div>

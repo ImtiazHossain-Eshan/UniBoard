@@ -64,14 +64,14 @@ require_once 'includes/functions.php';
                 </p>
             </div>
             <div class="feature-card">
-                <h3>📅 Event Management</h3>
+                <h3> Event Management</h3>
                 <p>
                     Never miss out on campus events. Get real-time updates, RSVP to events, 
                     and stay connected with your favorite activities.
                 </p>
             </div>
             <div class="feature-card">
-                <h3>🔔 Smart Notifications</h3>
+                <h3> Smart Notifications</h3>
                 <p>
                     Stay informed with personalized notifications about events, club updates, 
                     and community announcements tailored to your interests.
@@ -85,14 +85,14 @@ require_once 'includes/functions.php';
                 </p>
             </div>
             <div class="feature-card">
-                <h3>📊 Analytics Dashboard</h3>
+                <h3> Analytics Dashboard</h3>
                 <p>
                     Track event attendance, club engagement, and community growth with 
                     comprehensive analytics and insights.
                 </p>
             </div>
             <div class="feature-card">
-                <h3>🔐 Secure & Private</h3>
+                <h3> Secure & Private</h3>
                 <p>
                     Your data is protected with industry-standard security measures. 
                     Control your privacy settings and manage your digital footprint.
